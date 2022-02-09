@@ -10,3 +10,11 @@ Over the past few decades, the number of publications being published by univers
 <li>Express
 <li>React Js
 <li>Node JS
+
+<br>
+  
+<h3>REPORTS</h3>
+<li>Requirement report - Contains the requirement of stakeholders 
+<li>Debugging report - Contains the errors that are rectified
+<li>Paper report - Contains the details of the number of papers in the repository
+<li>Feedback report - Users likes and dislikes about the software
