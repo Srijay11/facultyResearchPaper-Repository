@@ -6,7 +6,7 @@ Over the past few decades, the number of publications being published by univers
 <br><br>
 
 <h3>TECHNOLOGIES USED</h3>
-<li>Mongo
+<li>MongoDB
 <li>Express
 <li>React Js
 <li>Node JS
