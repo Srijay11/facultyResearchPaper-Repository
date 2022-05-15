@@ -8,6 +8,7 @@ const Journal = require('./models/journal');
 const Theses = require('./models/theses');
 const Conference = require('./models/conference');
 const User = require('./models/user');
+const methodOverride = require('method-override');
 
 mongoose.connect('mongodb://localhost:27017/LUXEDB', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -19,7 +20,7 @@ mongoose.connect('mongodb://localhost:27017/LUXEDB', { useNewUrlParser: true, us
     })
 
 app.use(express.static(path.join(__dirname, '/public')))
-
+app.use(methodOverride('_method'));
 app.set('view engine','ejs');
 app.set('views', path.join(__dirname, '/views'))
 app.use(express.urlencoded({extended: true}))
@@ -28,6 +29,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+
 app.get('/', async (req, res) =>{
     isLoggedIn = false
     user = null;
@@ -118,25 +120,105 @@ app.post('/type', async(req,res)=>{
 })
 
 app.get('/products', async (req, res) =>{
-    const products = await Journal.find({})
-    const products2 = await Conference.find({})
-    res.render('products/allproducts', { products, products2 })
+    const products = await Theses.find({})
+    const products1 = await Conference.find({})
+    const products2 = await Journal.find({})
+    res.render('products/allproducts', { products, products1, products2 })
 })
 
+//journals
 app.get('/wallets', async(req, res) =>{
     const products = await Journal.find({})
     res.render('products/wallets', { products })
 })
 
+app.get('/wallets/:id', async (req, res) => {
+    const { id } = req.params;
+    const product = await Journal.findById(id);
+    res.render('individualj', { product });
+})
+
+app.get('/wallets/edit/:id',async(req, res) => {
+    const {id} = req.params;
+    const product = await Journal.findById(id);
+    res.render('editj',{product});
+})
+
+app.put('/wallets/:id', async (req, res) => {
+    const { id } = req.params;
+    const wallet = await Journal.findByIdAndUpdate(id, { ...req.body.movie });
+    res.redirect(`/wallets/${wallet._id}`);
+})
+
+app.delete('/wallets/:id', async (req, res) => {
+    const { id } = req.params;
+    await Journal.findByIdAndDelete(id);
+    res.redirect('/profile');
+
+})
+
+//Theses
 app.get('/watches', async(req, res) =>{
     const products = await Theses.find({})
     res.render('products/watches', { products })
 })
 
+app.get('/watches/:id', async (req, res) => {
+    const { id } = req.params;
+    const product = await Theses.findById(id);
+    res.render('individualt', { product });
+})
+
+app.get('/watches/edit/:id',async(req, res) => {
+    const {id} = req.params;
+    const product = await Theses.findById(id);
+    res.render('editt',{product});
+})
+
+app.put('/watches/:id', async (req, res) => {
+    const { id } = req.params;
+    const watch = await Theses.findByIdAndUpdate(id, { ...req.body.movie });
+    res.redirect(`/watches/${watch._id}`);
+})
+
+app.delete('/watches/:id', async (req, res) => {
+    const { id } = req.params;
+    await Theses.findByIdAndDelete(id);
+    res.redirect('/profile');
+
+})
+
+//Conference papers
 app.get('/bags', async(req, res) =>{
     const products = await Conference.find({})
     res.render('products/bags', { products })
 })
+
+app.get('/bags/:id', async (req, res) => {
+    const { id } = req.params;
+    const product = await Conference.findById(id);
+    res.render('individualc', { product });
+})
+
+app.get('/bags/edit/:id',async(req, res) => {
+    const {id} = req.params;
+    const product = await Journal.findById(id);
+    res.render('editc',{product});
+})
+
+app.put('/bags/:id', async (req, res) => {
+    const { id } = req.params;
+    const bag = await Conference.findByIdAndUpdate(id, { ...req.body.movie });
+    res.redirect(`/bags/${bag._id}`);
+})
+
+app.delete('/bags/:id', async (req, res) => {
+    const { id } = req.params;
+    await Conference.findByIdAndDelete(id);
+    res.redirect('/profile');
+
+})
+
 
 app.get('/products/new',(req, res) => {
     res.render('products/type')
@@ -167,13 +249,20 @@ app.post('/products2', async (req, res) => {
 })
 
 
-app.get('/profile',(req, res) => {
+app.get('/profile',async(req, res) => {
     if(!req.session.user_id)
     {
-        return res.redirect('/login')
+        return res.redirect('/login');
     }
     else
-    res.render("profile");
+    {
+        const product = await Theses.find({})
+        const product1 = await Journal.find({})
+        const product2 = await Conference.find({})
+
+        res.render("profile",{product,product1,product2});
+    }
+    
 })
 
 app.listen(3000, () =>{
